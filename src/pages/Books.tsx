@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  BookOpen, Search, Calculator, FlaskConical,
-  Globe, Landmark, Dumbbell, Languages, Palette, BookText,
-  ChevronRight, X,
-} from "lucide-react";
+import { BookOpen, Search, Filter } from "lucide-react";
 
 interface Book {
   id: number;
@@ -55,18 +51,6 @@ function getSubjectThumbnail(subject: string): string {
 function getGradeColor(grade: number): string {
   return GRADE_COLORS[grade] || "bg-gray-400";
 }
-
-const SUBJECT_ICONS: Record<string, React.ReactNode> = {
-  mathematics: <Calculator className="h-3.5 w-3.5" />,
-  science:     <FlaskConical className="h-3.5 w-3.5" />,
-  english:     <BookText className="h-3.5 w-3.5" />,
-  amharic:     <Languages className="h-3.5 w-3.5" />,
-  arts:        <Palette className="h-3.5 w-3.5" />,
-  sport:       <Dumbbell className="h-3.5 w-3.5" />,
-  civic:       <Landmark className="h-3.5 w-3.5" />,
-  oromic:      <Languages className="h-3.5 w-3.5" />,
-  "social studies": <Globe className="h-3.5 w-3.5" />,
-};
 
 export default function Books() {
   const [books, setBooks] = useState<Book[]>([]);
