@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BookOpen, Search, Filter } from "lucide-react";
+import { BookOpen, Search, Filter, ExternalLink } from "lucide-react";
 
 interface Book {
   id: number;
@@ -50,6 +50,18 @@ function getSubjectThumbnail(subject: string): string {
 
 function getGradeColor(grade: number): string {
   return GRADE_COLORS[grade] || "bg-gray-400";
+}
+
+function getGradeBorderColor(grade: number): string {
+  const borders: Record<number, string> = {
+    1: "border-yellow-400",
+    2: "border-green-400",
+    3: "border-blue-400",
+    4: "border-purple-400",
+    5: "border-orange-400",
+    6: "border-red-400",
+  };
+  return borders[grade] || "border-gray-300";
 }
 
 export default function Books() {
@@ -348,131 +360,210 @@ export default function Books() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <BookOpen className="h-16 w-16 mx-auto mb-4" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Digital Book Library</h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            Explore your collection of educational books for grades 1–6
+    <div className="min-h-screen bg-slate-50">
+      {/* ── Hero ── */}
+      <div className="relative bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white py-20 overflow-hidden">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full" />
+        <div className="absolute -bottom-16 -left-16 w-72 h-72 bg-white/10 rounded-full" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-sm rounded-full px-5 py-2 mb-6">
+            <BookOpen className="h-4 w-4" />
+            <span className="text-sm font-medium">Educational Resource Hub</span>
+          </div>
+          <h1 className="text-5xl md:text-6xl font-extrabold mb-4 tracking-tight">
+            Digital Book Library
+          </h1>
+          <p className="text-xl text-blue-100 max-w-2xl mx-auto mb-10">
+            Explore our collection of educational books for grades 1–6
           </p>
+          <div className="flex justify-center items-center gap-10">
+            <div className="text-center">
+              <p className="text-4xl font-extrabold">{books.length}</p>
+              <p className="text-blue-200 text-sm mt-1">Books</p>
+            </div>
+            <div className="w-px h-10 bg-white/25" />
+            <div className="text-center">
+              <p className="text-4xl font-extrabold">6</p>
+              <p className="text-blue-200 text-sm mt-1">Grades</p>
+            </div>
+            <div className="w-px h-10 bg-white/25" />
+            <div className="text-center">
+              <p className="text-4xl font-extrabold">{subjects.length}</p>
+              <p className="text-blue-200 text-sm mt-1">Subjects</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Filter Section */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <div className="flex items-center mb-4">
-            <Filter className="h-5 w-5 text-gray-600 mr-2" />
-            <h2 className="text-lg font-semibold text-gray-900">Filter Books</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Search */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search books..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        {/* ── Filter Panel ── */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2">
+              <Filter className="h-5 w-5 text-blue-600" />
+              <h2 className="text-lg font-bold text-gray-900">Filter Books</h2>
+            </div>
+            {(selectedGrade || selectedSubject || searchQuery) && (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-500">
+                  {filteredBooks.length} of {books.length} books
+                </span>
+                <button
+                  onClick={resetFilters}
+                  className="text-sm text-blue-600 font-semibold bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-full transition-colors"
+                >
+                  Clear all
+                </button>
               </div>
-            </div>
+            )}
+          </div>
 
-            {/* Grade */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Grade Level</label>
-              <select
-                value={selectedGrade || ""}
-                onChange={(e) => setSelectedGrade(e.target.value ? Number(e.target.value) : null)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">All Grades</option>
-                {grades.map((grade) => (
-                  <option key={grade} value={grade}>
-                    Grade {grade}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Search */}
+          <div className="relative mb-5">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by title or description…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-400 transition"
+            />
+          </div>
 
-            {/* Subject */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-              <select
-                value={selectedSubject || ""}
-                onChange={(e) => setSelectedSubject(e.target.value || null)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          {/* Grade pills */}
+          <div className="mb-4">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Grade Level</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setSelectedGrade(null)}
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
+                  selectedGrade === null
+                    ? "bg-gray-800 text-white border-gray-800"
+                    : "bg-white text-gray-600 border-gray-300 hover:border-gray-500"
+                }`}
               >
-                <option value="">All Subjects</option>
-                {subjects.map((subject) => (
-                  <option key={subject} value={subject}>
-                    {subject}
-                  </option>
-                ))}
-              </select>
+                All
+              </button>
+              {grades.map((grade) => (
+                <button
+                  key={grade}
+                  onClick={() => setSelectedGrade(selectedGrade === grade ? null : grade)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
+                    selectedGrade === grade
+                      ? `${getGradeColor(grade)} text-white border-transparent shadow-sm`
+                      : `bg-white text-gray-600 border-gray-300 hover:${getGradeBorderColor(grade)}`
+                  }`}
+                >
+                  Grade {grade}
+                </button>
+              ))}
             </div>
           </div>
 
-          {(selectedGrade || selectedSubject || searchQuery) && (
-            <div className="mt-4 flex items-center justify-between">
-              <p className="text-sm text-gray-600">
-                Showing {filteredBooks.length} of {books.length} books
-              </p>
+          {/* Subject chips */}
+          <div>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Subject</p>
+            <div className="flex flex-wrap gap-2">
               <button
-                onClick={resetFilters}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                onClick={() => setSelectedSubject(null)}
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
+                  selectedSubject === null
+                    ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                    : "bg-white text-gray-600 border-gray-300 hover:border-blue-400"
+                }`}
               >
-                Clear Filters
+                All Subjects
               </button>
+              {subjects.map((subject) => (
+                <button
+                  key={subject}
+                  onClick={() => setSelectedSubject(selectedSubject === subject ? null : subject)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
+                    selectedSubject === subject
+                      ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                      : "bg-white text-gray-600 border-gray-300 hover:border-blue-400"
+                  }`}
+                >
+                  {subject}
+                </button>
+              ))}
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Book List */}
+        {/* ── Book Grid ── */}
         {loading ? (
-          <div className="text-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm animate-pulse">
+                <div className="h-48 bg-gray-200" />
+                <div className="p-5 space-y-3">
+                  <div className="h-4 bg-gray-200 rounded-full w-3/4" />
+                  <div className="h-3 bg-gray-200 rounded-full w-full" />
+                  <div className="h-3 bg-gray-200 rounded-full w-5/6" />
+                  <div className="h-10 bg-gray-200 rounded-xl mt-4" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredBooks.length === 0 ? (
-          <div className="text-center py-12">
-            <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No books found</h3>
-            <p className="text-gray-600">Try adjusting your filters or search query</p>
+          <div className="text-center py-20">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-50 rounded-full mb-4">
+              <BookOpen className="h-10 w-10 text-blue-400" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No books found</h3>
+            <p className="text-gray-500 mb-4">Try adjusting your filters or search query</p>
+            <button
+              onClick={resetFilters}
+              className="text-blue-600 font-semibold hover:underline"
+            >
+              Reset all filters
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBooks.map((book) => (
               <div
                 key={book.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+                className="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
               >
-                <div className={`h-2 w-full ${getGradeColor(book.grade_level)}`} />
-                <img
-                  src={book.cover_image_url || getSubjectThumbnail(book.subject)}
-                  alt={book.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-semibold text-blue-600">
-                      Grade {book.grade_level}
-                    </span>
-                    <span className="text-sm text-gray-600">{book.subject}</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{book.title}</h3>
-                  <p className="text-gray-600 mb-4 line-clamp-3">{book.description}</p>
+                {/* Thumbnail with overlaid badges */}
+                <div className="relative overflow-hidden">
+                  <img
+                    src={book.cover_image_url || getSubjectThumbnail(book.subject)}
+                    alt={book.title}
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                  <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-bold px-3 py-1 rounded-full shadow">
+                    {book.subject}
+                  </span>
+                  <span
+                    className={`absolute top-3 right-3 ${getGradeColor(book.grade_level)} text-white text-xs font-bold px-3 py-1 rounded-full shadow`}
+                  >
+                    Grade {book.grade_level}
+                  </span>
+                </div>
+
+                {/* Card body */}
+                <div className="p-5 flex flex-col flex-1">
+                  <h3 className="font-bold text-gray-900 text-base leading-snug mb-2 line-clamp-2">
+                    {book.title}
+                  </h3>
+                  {book.description && (
+                    <p className="text-sm text-gray-500 line-clamp-2 flex-1 mb-4">
+                      {book.description}
+                    </p>
+                  )}
                   <a
                     href={book.file_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full block text-center bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    className="mt-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white py-2.5 px-4 rounded-xl font-semibold text-sm transition-all"
                   >
-                    Open PDF
+                    <BookOpen className="h-4 w-4" />
+                    Open Book
+                    <ExternalLink className="h-3 w-3 opacity-70" />
                   </a>
                 </div>
               </div>
