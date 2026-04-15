@@ -11,6 +11,47 @@ interface Book {
   file_url?: string;
 }
 
+const SUBJECT_THUMBNAILS: Record<string, string> = {
+  mathematics:
+    "https://images.pexels.com/photos/3729557/pexels-photo-3729557.jpeg?auto=compress&cs=tinysrgb&w=400",
+  science:
+    "https://images.pexels.com/photos/2280571/pexels-photo-2280571.jpeg?auto=compress&cs=tinysrgb&w=400",
+  english:
+    "https://images.pexels.com/photos/159581/pexels-photo-159581.jpeg?auto=compress&cs=tinysrgb&w=400",
+  amharic:
+    "https://images.pexels.com/photos/261763/pexels-photo-261763.jpeg?auto=compress&cs=tinysrgb&w=400",
+  arts:
+    "https://images.pexels.com/photos/1646953/pexels-photo-1646953.jpeg?auto=compress&cs=tinysrgb&w=400",
+  sport:
+    "https://images.pexels.com/photos/3621104/pexels-photo-3621104.jpeg?auto=compress&cs=tinysrgb&w=400",
+  civic:
+    "https://images.pexels.com/photos/1550337/pexels-photo-1550337.jpeg?auto=compress&cs=tinysrgb&w=400",
+  oromic:
+    "https://images.pexels.com/photos/5905489/pexels-photo-5905489.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "social studies":
+    "https://images.pexels.com/photos/207529/pexels-photo-207529.jpeg?auto=compress&cs=tinysrgb&w=400",
+};
+
+const GRADE_COLORS: Record<number, string> = {
+  1: "bg-yellow-400",
+  2: "bg-green-400",
+  3: "bg-blue-400",
+  4: "bg-purple-400",
+  5: "bg-orange-400",
+  6: "bg-red-400",
+};
+
+function getSubjectThumbnail(subject: string): string {
+  return (
+    SUBJECT_THUMBNAILS[subject.toLowerCase()] ||
+    "https://images.pexels.com/photos/6256065/pexels-photo-6256065.jpeg?auto=compress&cs=tinysrgb&w=400"
+  );
+}
+
+function getGradeColor(grade: number): string {
+  return GRADE_COLORS[grade] || "bg-gray-400";
+}
+
 export default function Books() {
   const [books, setBooks] = useState<Book[]>([]);
   const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
@@ -410,13 +451,11 @@ export default function Books() {
                 key={book.id}
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
               >
+                <div className={`h-2 w-full ${getGradeColor(book.grade_level)}`} />
                 <img
-                  src={
-                    book.cover_image_url ||
-                    "https://images.pexels.com/photos/6256065/pexels-photo-6256065.jpeg?auto=compress&cs=tinysrgb&w=400"
-                  }
+                  src={book.cover_image_url || getSubjectThumbnail(book.subject)}
                   alt={book.title}
-                  className="w-full h-56 object-cover"
+                  className="w-full h-48 object-cover"
                 />
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-3">
